@@ -66,7 +66,7 @@ TEST(ScannerReplyMsgTest, testserialize)
   DecodingEquals(raw_msg, 0x00, crc.checksum());
   DecodingEquals(raw_msg, 0x04, reserved);
   DecodingEquals(raw_msg, 0x08, op_code);
-  DecodingEquals(raw_msg, 0x12, res_code);
+  DecodingEquals(raw_msg, 0x0C, res_code);
 }
 
 TEST(ScannerReplyMsgTest, testCalcCRC)
@@ -76,7 +76,7 @@ TEST(ScannerReplyMsgTest, testCalcCRC)
   // Calculate crc checksum from raw data
   RawData raw_msg{ msg.serialize() };
   boost::crc_32_type crc;
-  crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
+  crc.process_bytes(&raw_msg.at(sizeof(uint32_t)), raw_msg.size() - sizeof(uint32_t));
 
   EXPECT_EQ(crc.checksum(), ScannerReplyMsg::calcCRC(msg));
 }

@@ -93,7 +93,7 @@ void UdpClientTests::sendTestDataToClient()
 void UdpClientTests::sendEmptyTestDataToClient()
 {
   const psen_scan_v2::RawData data;
-  mock_udp_server_.asyncSend<62000>(host_endpoint, data);
+  mock_udp_server_.asyncSend<MAX_UDP_PAKET_SIZE>(host_endpoint, data);
 }
 
 TEST_F(UdpClientTests, testAsyncReadOperation)

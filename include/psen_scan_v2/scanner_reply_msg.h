@@ -172,9 +172,7 @@ inline RawData ScannerReplyMsg::serialize() const
   std::string data_str(os.str());
   assert(data_str.length() == REPLY_MSG_FROM_SCANNER_SIZE && "Message data of start reply has not the expected size");
 
-  RawData ret_val{};
-  std::copy(data_str.begin(), data_str.end(), ret_val.begin());
-
+  RawData ret_val(data_str.begin(), data_str.end());
   return ret_val;
 }
 inline ScannerReplyMsg::CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
