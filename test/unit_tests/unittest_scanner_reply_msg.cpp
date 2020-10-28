@@ -87,8 +87,7 @@ TEST(ScannerReplyMsgTest, testdeserializeValidCRC)
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   RawData raw_msg{ msg.serialize() };
 
-  RawData data;
-  std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
+  RawData data(raw_msg.begin(), raw_msg.end());
 
   ScannerReplyMsg msg_from_raw{ ScannerReplyMsg::deserialize(data) };
 
@@ -103,11 +102,9 @@ TEST(ScannerReplyMsgTest, testdeserializeInvalidCRC)
   // Use raw data generated from serialize()
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   RawData raw_msg{ msg.serialize() };
-  raw_msg[0] += 0x01;  // alter crc checksum
+  raw_msg.at(0) += 0x01;  // alter crc checksum
 
-  RawData data;
-  std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
-
+  RawData data(raw_msg.begin(), raw_msg.end());
   EXPECT_THROW(ScannerReplyMsg::deserialize(data), ScannerReplyMsg::CRCMismatch);
 }
 
