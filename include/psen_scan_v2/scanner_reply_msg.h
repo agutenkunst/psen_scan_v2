@@ -59,7 +59,7 @@ public:
   };
 
 public:
-  static ScannerReplyMsg deserialize(const MaxSizeRawData& data);
+  static ScannerReplyMsg deserialize(const RawData& data);
 
 public:
   /**
@@ -79,8 +79,7 @@ public:
 public:
   static uint32_t calcCRC(const ScannerReplyMsg& msg);
 
-  using RawType = FixedSizeRawData<REPLY_MSG_FROM_SCANNER_SIZE>;
-  RawType serialize() const;
+  RawData serialize() const;
 
 private:
   template <typename T>
@@ -123,11 +122,11 @@ inline ScannerReplyMsg::ScannerReplyMsg(const uint32_t op_code, const uint32_t r
   crc_ = calcCRC(*this);
 }
 
-inline ScannerReplyMsg ScannerReplyMsg::deserialize(const MaxSizeRawData& data)
+inline ScannerReplyMsg ScannerReplyMsg::deserialize(const RawData& data)
 {
   ScannerReplyMsg msg{ 0, 0 };
 
-  MaxSizeRawData tmp_data{ data };
+  RawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), REPLY_MSG_FROM_SCANNER_SIZE));
 
   raw_processing::read(is, msg.crc_);
@@ -158,7 +157,7 @@ inline ScannerReplyMsgType ScannerReplyMsg::type() const
   return ScannerReplyMsgType::Unknown;
 }
 
-inline ScannerReplyMsg::RawType ScannerReplyMsg::serialize() const
+inline RawData ScannerReplyMsg::serialize() const
 {
   std::ostringstream os;
 
@@ -173,7 +172,7 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::serialize() const
   std::string data_str(os.str());
   assert(data_str.length() == REPLY_MSG_FROM_SCANNER_SIZE && "Message data of start reply has not the expected size");
 
-  ScannerReplyMsg::RawType ret_val{};
+  RawData ret_val{};
   std::copy(data_str.begin(), data_str.end(), ret_val.begin());
 
   return ret_val;

@@ -44,13 +44,13 @@ uint32_t StopRequest::calcCrc() const
   return psen_scan_v2::calcCrc(processMember(os));
 }
 
-DynamicSizeRawData StopRequest::serialize() const
+RawData StopRequest::serialize() const
 {
   std::ostringstream os;
   uint32_t crc{ calcCrc() };
   raw_processing::write(os, crc);
   processMember(os);
-  return raw_processing::toArray<DynamicSizeRawData>(os);
+  return raw_processing::toArray<RawData>(os);
 }
 
 }  // namespace psen_scan_v2

@@ -46,6 +46,8 @@ namespace psen_scan_v2_test
 {
 using namespace psen_scan_v2;
 
+using MaxSizeUdpRawData = std::array<char, 65507>;
+
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 
@@ -167,8 +169,8 @@ public:
   }
 
 public:
-  MOCK_METHOD2(receiveControlMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
-  MOCK_METHOD2(receiveDataMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
+  MOCK_METHOD2(receiveControlMsg, void(const udp::endpoint&, const psen_scan_v2::RawData&));
+  MOCK_METHOD2(receiveDataMsg, void(const udp::endpoint&, const psen_scan_v2::RawData&));
 
 public:
   void startListeningForControlMsg();
@@ -240,16 +242,15 @@ void ScannerMock::sendStopReply()
 void ScannerMock::sendMonitoringFrame(const monitoring_frame::Message& msg)
 {
   std::cout << "ScannerMock: Send monitoring frame..." << std::endl;
-  DynamicSizeRawData dynamic_raw_scan = serialize(msg);
-  MaxSizeRawData max_size_raw_data = convertToMaxSizeRawData(dynamic_raw_scan);
+  RawData raw_scan = serialize(msg);
 
-  data_server_.asyncSend<max_size_raw_data.size()>(monitoring_frame_receiver_, max_size_raw_data);
+  data_server_.asyncSend<MAX_UDP_PAKET_SIZE>(monitoring_frame_receiver_, raw_scan);
 }
 
 void ScannerMock::sendEmptyMonitoringFrame()
 {
-  const psen_scan_v2::FixedSizeRawData<0> data;
-  data_server_.asyncSend<data.size()>(monitoring_frame_receiver_, data);
+  psen_scan_v2::RawData data;
+  data_server_.asyncSend<MAX_UDP_PAKET_SIZE>(monitoring_frame_receiver_, data);
 }
 
 TEST_F(ScannerAPITests, testStartFunctionality)

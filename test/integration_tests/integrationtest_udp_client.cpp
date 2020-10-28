@@ -57,10 +57,10 @@ class UdpClientTests : public testing::Test, public testing::AsyncTest
 {
 public:
   UdpClientTests();
-  MOCK_METHOD2(handleNewData, void(const MaxSizeRawData&, const std::size_t&));
+  MOCK_METHOD2(handleNewData, void(const RawData&, const std::size_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 
-  MOCK_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
+  MOCK_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2::RawData&));
 
 public:
   void sendTestDataToClient();
@@ -75,7 +75,8 @@ protected:
                                                                 inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
                                                                 UDP_MOCK_PORT) };
 
-  FixedSizeRawData<DATA_SIZE_BYTES> send_array = { "Hello" };
+  std::string hello = { "Hello" };
+  RawData send_array = RawData(hello.begin(), hello.end());
   const udp::endpoint host_endpoint;
 };
 
@@ -91,8 +92,8 @@ void UdpClientTests::sendTestDataToClient()
 
 void UdpClientTests::sendEmptyTestDataToClient()
 {
-  const psen_scan_v2::FixedSizeRawData<0> data;
-  mock_udp_server_.asyncSend<data.size()>(host_endpoint, data);
+  const psen_scan_v2::RawData data;
+  mock_udp_server_.asyncSend<62000>(host_endpoint, data);
 }
 
 TEST_F(UdpClientTests, testAsyncReadOperation)
@@ -133,7 +134,7 @@ TEST_F(UdpClientTests, testErrorHandlingForReceive)
 TEST_F(UdpClientTests, testWriteOperation)
 {
   std::string str = "Hello!";
-  DynamicSizeRawData write_buf;
+  RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
   EXPECT_CALL(*this, receivedUdpMsg(_, write_buf)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
@@ -147,7 +148,7 @@ TEST_F(UdpClientTests, testWriteOperation)
 TEST_F(UdpClientTests, testWritingWhileReceiving)
 {
   std::string str = "Hello!";
-  DynamicSizeRawData write_buf;
+  RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
   EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));

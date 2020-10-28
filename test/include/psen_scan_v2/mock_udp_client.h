@@ -65,10 +65,10 @@ public:
   // "Simulates" function call which uses default values
   MOCK_METHOD0(startAsyncReceiving, void());
   MOCK_METHOD1(startAsyncReceiving, void(const ReceiveMode& modi));
-  MOCK_METHOD1(write, void(const DynamicSizeRawData& data));
+  MOCK_METHOD1(write, void(const RawData& data));
 
 private:
-  void handleNewData(const MaxSizeRawData& received_data, const std::size_t& bytes_received);
+  void handleNewData(const RawData& received_data, const std::size_t& bytes_received);
 
 private:
   NewDataHandler data_handler_;
@@ -80,7 +80,7 @@ void MockUdpClient::sendStartReply()
 {
   const ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   const auto data{ msg.serialize() };
-  MaxSizeRawData max_size_data;
+  RawData max_size_data;
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
   handleNewData(max_size_data, max_size_data.size());
@@ -90,7 +90,7 @@ void MockUdpClient::sendStopReply()
 {
   const ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
   const auto data{ msg.serialize() };
-  MaxSizeRawData max_size_data;
+  RawData max_size_data;
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
   handleNewData(max_size_data, max_size_data.size());
@@ -98,11 +98,11 @@ void MockUdpClient::sendStopReply()
 
 void MockUdpClient::sendMonitoringFrame(monitoring_frame::Message& msg)
 {
-  const MaxSizeRawData msg_raw = convertToMaxSizeRawData(serialize(msg));
+  const RawData msg_raw = convertToRawData(serialize(msg));
   handleNewData(msg_raw, msg_raw.size());
 }
 
-void MockUdpClient::handleNewData(const MaxSizeRawData& received_data, const std::size_t& bytes_received)
+void MockUdpClient::handleNewData(const RawData& received_data, const std::size_t& bytes_received)
 {
   data_handler_(received_data, bytes_received);
 }

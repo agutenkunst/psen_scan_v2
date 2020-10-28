@@ -47,7 +47,7 @@ public:
   //! @returns the CRC of the start request.
   uint32_t calculateCRC() const;
 
-  DynamicSizeRawData serialize() const;
+  RawData serialize() const;
 
 private:
   uint32_t crc_{ 0 }; /**< Will be filled in constructor */

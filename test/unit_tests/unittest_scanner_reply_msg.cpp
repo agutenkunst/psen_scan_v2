@@ -23,6 +23,7 @@
 
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
+#include "psen_scan_v2/raw_scanner_data.h"
 
 using namespace psen_scan_v2;
 
@@ -55,7 +56,7 @@ TEST(ScannerReplyMsgTest, testserialize)
   const uint32_t res_code{ RES_CODE_ACCEPTED };
 
   ScannerReplyMsg msg(op_code, res_code);
-  ScannerReplyMsg::RawType raw_msg{ msg.serialize() };
+  RawData raw_msg{ msg.serialize() };
 
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
@@ -73,7 +74,7 @@ TEST(ScannerReplyMsgTest, testCalcCRC)
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
 
   // Calculate crc checksum from raw data
-  ScannerReplyMsg::RawType raw_msg{ msg.serialize() };
+  RawData raw_msg{ msg.serialize() };
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
 
@@ -84,9 +85,9 @@ TEST(ScannerReplyMsgTest, testdeserializeValidCRC)
 {
   // Use raw data generated from serialize()
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  ScannerReplyMsg::RawType raw_msg{ msg.serialize() };
+  RawData raw_msg{ msg.serialize() };
 
-  MaxSizeRawData data;
+  RawData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
   ScannerReplyMsg msg_from_raw{ ScannerReplyMsg::deserialize(data) };
@@ -101,10 +102,10 @@ TEST(ScannerReplyMsgTest, testdeserializeInvalidCRC)
 {
   // Use raw data generated from serialize()
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  ScannerReplyMsg::RawType raw_msg{ msg.serialize() };
+  RawData raw_msg{ msg.serialize() };
   raw_msg[0] += 0x01;  // alter crc checksum
 
-  MaxSizeRawData data;
+  RawData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
   EXPECT_THROW(ScannerReplyMsg::deserialize(data), ScannerReplyMsg::CRCMismatch);
