@@ -337,6 +337,23 @@ target_link_libraries(integrationtest_scanner_api
   ${pilz_testutils_LIBRARIES}
   )
 
+  catkin_add_gmock(integrationtest_threading_stress_test
+    test/integration_tests/integrationtest_threading_stress_test.cpp
+    test/src/monitoring_frame_serialization.cpp
+    src/scanner_v2.cpp
+    src/laserscan.cpp
+    src/monitoring_frame_msg.cpp
+    src/monitoring_frame_deserialization.cpp
+    src/scanner_configuration.cpp
+    src/start_request.cpp
+    src/stop_request.cpp
+    src/diagnostics.cpp
+  )
+  target_link_libraries(integrationtest_threading_stress_test
+    ${catkin_LIBRARIES}
+    ${pilz_testutils_LIBRARIES}
+    )
+
   add_rostest_gmock(integrationtest_ros_scanner_node
     test/integration_tests/integrationtest_ros_scanner_node.test
     test/integration_tests/integrationtest_ros_scanner_node.cpp
