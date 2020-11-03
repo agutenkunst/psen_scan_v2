@@ -108,16 +108,16 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
   #define REV(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) arg8, arg7, arg6, arg5, arg4, arg3, arg2, arg1
 
   static constexpr std::array<std::array<ErrorType, 8>, 9> error_bits{{
-  //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
-  { REV(Et::OSSD1_OC,    Et::OSSD_SHRT_C,  Et::OSSD_INTEGR,  Et::INT,          Et::INT,          Et::INT,              Et::INT,               Et::INT) },
-  { REV(Et::WIN_CLN_AL,  Et::POWER_SUPPLY, Et::NETW_PRB,     Et::DUST_CRC_FL,  Et::INT,          Et::INT,              Et::UNUSED,            Et::OSSD2_OVERCUR) },
-  { REV(Et::MEAS_PROB,   Et::INT,          Et::INT,          Et::INT,          Et::INCOHERENCE,  Et::ZONE_INVAL_TRANS, Et::ZONE_INVALID_CONF, Et::WIN_CLN_WARN) },
-  { REV(Et::INT_COM_PRB, Et::INT,          Et::INT,          Et::GENERIC_ERR,  Et::DISP_COM_PRB, Et::INT,              Et::INT,               Et::TEMP_MEAS_PROB) },
-  { REV(Et::ENCOD_OOR,   Et::UNUSED,       Et::UNUSED,       Et::EDM2_ERR,     Et::EDM1_ERR,     Et::CONF_ERR,         Et::OUT_OF_RANGE_ERR,  Et::TEMP_RANGE_ERR) },
-  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::ENCODER_GENERIC_ERR) },
-  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
-  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
-  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
+  //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                     Bit0
+  { REV(Et::OSSD1_OC,    Et::OSSD_SHRT_C,  Et::OSSD_INTEGR,  Et::INT,          Et::INT,          Et::INT,              Et::INT,                 Et::INT) },
+  { REV(Et::WIN_CLN_AL,  Et::POWER_SUPPLY, Et::NETW_PRB,     Et::DUST_CRC_FL,  Et::INT,          Et::INT,              Et::UNUSED,              Et::OSSD2_OVERCUR) },
+  { REV(Et::MEAS_PROB,   Et::INT,          Et::INT,          Et::INT,          Et::INCOHERENCE,  Et::ZONE_INVAL_TRANS, Et::ZONE_INVALID_CONF,   Et::WIN_CLN_WARN) },
+  { REV(Et::INT,         Et::INT,          Et::INT,          Et::GENERIC_ERR,  Et::DISP_COM_PRB, Et::INT,              Et::INT,                 Et::TEMP_MEAS_PROB) },
+  { REV(Et::INT,         Et::INT,          Et::EDM2_ERR,     Et::EDM1_ERR,     Et::CONF_ERR,     Et::OUT_OF_RANGE_ERR, Et::TEMP_RANGE_ERR,      Et::INT) },
+  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::ENCODER_GENERIC_ERR, Et::ENCOD_OOR) },
+  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,              Et::UNUSED) },
+  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,              Et::UNUSED) },
+  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,              Et::UNUSED) },
   }};
 // clang-format on
 
