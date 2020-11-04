@@ -17,6 +17,7 @@
 #define PSEN_SCAN_V2_SCANNER_IDS_H
 
 #include <array>
+#include <map>
 
 namespace psen_scan_v2
 {

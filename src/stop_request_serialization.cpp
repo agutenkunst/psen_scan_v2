@@ -12,23 +12,29 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_STOP_REQUEST_H
-#define PSEN_SCAN_V2_STOP_REQUEST_H
 
-#include <cstdint>
+#include <boost/crc.hpp>
+
 #include <iostream>
-#include <array>
 
-#include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/stop_request.h"
+#include "psen_scan_v2/stop_request_serialization.h"
+#include "psen_scan_v2/raw_processing.h"
 
 namespace psen_scan_v2
 {
-namespace stop_request
+psen_scan_v2::DynamicSizeRawData psen_scan_v2::stop_request::serialize(const stop_request::Message& stop_request)
 {
-class Message
-{
-};
-}  // namespace stop_request
-}  // namespace psen_scan_v2
+  std::ostringstream os;
 
-#endif  // PSEN_SCAN_STOP_REQUEST_H
+  boost::crc_32_type crc;
+  crc.process_bytes(&stop_request::RESERVED, sizeof(stop_request::RESERVED));
+  crc.process_bytes(&stop_request::OPCODE, sizeof(stop_request::OPCODE));
+
+  raw_processing::write(os, static_cast<uint32_t>(crc.checksum()));
+  raw_processing::write(os, stop_request::RESERVED);
+  raw_processing::write(os, stop_request::OPCODE);
+
+  return raw_processing::toArray<DynamicSizeRawData>(os);
+}
+}  // namespace psen_scan_v2

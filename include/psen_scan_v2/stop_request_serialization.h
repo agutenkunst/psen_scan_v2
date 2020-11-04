@@ -12,23 +12,21 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_STOP_REQUEST_H
-#define PSEN_SCAN_V2_STOP_REQUEST_H
+#ifndef PSEN_SCAN_V2_STOP_REQUEST_SERIALIZATION_H
+#define PSEN_SCAN_V2_STOP_REQUEST_SERIALIZATION_H
 
-#include <cstdint>
-#include <iostream>
-#include <array>
-
-#include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/stop_request.h"
 
 namespace psen_scan_v2
 {
 namespace stop_request
 {
-class Message
-{
-};
+static constexpr std::size_t SIZE{ 20 };
+static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
+const std::array<uint8_t, NUM_RESERVED_FIELDS> RESERVED{};
+const uint32_t OPCODE{ htole32(0x36) };
+
+DynamicSizeRawData serialize(const stop_request::Message& stop_request);
 }  // namespace stop_request
 }  // namespace psen_scan_v2
-
-#endif  // PSEN_SCAN_STOP_REQUEST_H
+#endif

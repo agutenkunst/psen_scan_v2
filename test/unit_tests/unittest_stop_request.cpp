@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2/stop_request.h"
+#include "psen_scan_v2/stop_request_serialization.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
 
 using namespace psen_scan_v2;
@@ -30,30 +31,30 @@ class StopRequestTest : public ::testing::Test
 
 TEST_F(StopRequestTest, constructorTest)
 {
-  StopRequest request;
-  auto data{ request.serialize() };
+  const stop_request::Message request;
+  auto data{ serialize(request) };
   boost::crc_32_type crc;
   crc.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
   EXPECT_TRUE(DecodingEquals(data, 0x00, static_cast<uint32_t>(crc.checksum()))) << "Calculated CRC incorrect";
 
   const std::size_t crc_offset{ 4u };
-  for (std::size_t i = 0; i < StopRequest::NUM_RESERVED_FIELDS; ++i)
+  for (std::size_t i = 0; i < stop_request::NUM_RESERVED_FIELDS; ++i)
   {
     const std::size_t curr_field_offset{ crc_offset + i * sizeof(uint8_t) };
     EXPECT_TRUE(DecodingEquals(data, curr_field_offset, static_cast<uint8_t>(0)))
         << "Reserved field has incorrect value";
   }
 
-  const std::size_t op_code_offset{ crc_offset + StopRequest::NUM_RESERVED_FIELDS * sizeof(uint8_t) };
+  const std::size_t op_code_offset{ crc_offset + stop_request::NUM_RESERVED_FIELDS * sizeof(uint8_t) };
   EXPECT_TRUE(DecodingEquals(data, op_code_offset, static_cast<uint32_t>(0x36))) << "OP code incorrect";
 }
 
 TEST_F(StopRequestTest, regressionForRealSystem)
 {
-  StopRequest sr;
+  stop_request::Message sr;
 
-  auto data = sr.serialize();
+  auto data = serialize(sr);
 
   unsigned char expected_crc[4] = { 0x28, 0xec, 0xfb, 0x39 };  // see wireshark for this number
 

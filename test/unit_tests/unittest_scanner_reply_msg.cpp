@@ -22,6 +22,7 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2/scanner_reply_msg.h"
+#include "psen_scan_v2/scanner_reply_serialization_deserialization.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
 
 using namespace psen_scan_v2;
@@ -34,80 +35,90 @@ static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 
 TEST(ScannerReplyMsgTest, testTypeStart)
 {
-  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  EXPECT_EQ(ScannerReplyMsgType::start, msg.type());
+  scanner_reply::Type type = scanner_reply::Type::start;
+  scanner_reply::OperationResult result = scanner_reply::OperationResult::accepted;
+  scanner_reply::Message msg(type, result);
+  EXPECT_EQ(scanner_reply::Type::start, msg.type());
 }
 
 TEST(ScannerReplyMsgTest, testTypeUnknown)
 {
-  ScannerReplyMsg msg(OP_CODE_UNKNOWN, RES_CODE_ACCEPTED);
-  EXPECT_EQ(ScannerReplyMsgType::unknown, msg.type());
+  scanner_reply::Type type = scanner_reply::Type::unknown;
+  scanner_reply::OperationResult result = scanner_reply::OperationResult::accepted;
+  scanner_reply::Message msg(type, result);
+  EXPECT_EQ(scanner_reply::Type::unknown, msg.type());
 }
 
 TEST(ScannerReplyMsgTest, testGetStartOpCode)
 {
-  EXPECT_EQ(OP_CODE_START, getOpCodeValue(ScannerReplyMsgType::start));
+  EXPECT_EQ(OP_CODE_START, static_cast<uint32_t>(scanner_reply::Type::start));
 }
 
 TEST(ScannerReplyMsgTest, testserialize)
 {
-  const uint32_t op_code{ OP_CODE_START };
-  const uint32_t res_code{ RES_CODE_ACCEPTED };
+  scanner_reply::Type type = scanner_reply::Type::start;
+  scanner_reply::OperationResult result = scanner_reply::OperationResult::accepted;
 
-  ScannerReplyMsg msg(op_code, res_code);
-  ScannerReplyMsg::RawType raw_msg{ msg.serialize() };
+  scanner_reply::Message msg(type, result);
+  scanner_reply::RawType raw_msg{ scanner_reply::serialize(msg) };
 
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
 
   const uint32_t reserved{ 0 };
 
-  DecodingEquals(raw_msg, 0x00, crc.checksum());
-  DecodingEquals(raw_msg, 0x04, reserved);
-  DecodingEquals(raw_msg, 0x08, op_code);
-  DecodingEquals(raw_msg, 0x12, res_code);
+  EXPECT_TRUE(DecodingEquals(raw_msg, 0x00, crc.checksum()));
+  EXPECT_TRUE(DecodingEquals(raw_msg, 0x04, reserved));
+  EXPECT_TRUE(DecodingEquals(raw_msg, 0x08, static_cast<uint32_t>(scanner_reply::Type::start)));
+  EXPECT_TRUE(DecodingEquals(raw_msg, 0x0C, static_cast<uint32_t>(scanner_reply::OperationResult::accepted)));
 }
 
-TEST(ScannerReplyMsgTest, testCalcCRC)
+TEST(ScannerReplyMsgTest, testdeserializeUnknownFields)
 {
-  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
+  scanner_reply::Type type = scanner_reply::Type::unknown;
+  scanner_reply::OperationResult result = scanner_reply::OperationResult::unknown;
+  scanner_reply::Message msg(type, result);
 
-  // Calculate crc checksum from raw data
-  ScannerReplyMsg::RawType raw_msg{ msg.serialize() };
-  boost::crc_32_type crc;
-  crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
+  scanner_reply::RawType raw_msg{ scanner_reply::serialize(msg) };
 
-  EXPECT_EQ(crc.checksum(), ScannerReplyMsg::calcCRC(msg));
+  scanner_reply::Message deserialized = scanner_reply::deserialize<scanner_reply::RawType>(raw_msg);
+
+  EXPECT_EQ(deserialized.type(), scanner_reply::Type::unknown);
+  EXPECT_EQ(deserialized.result(), scanner_reply::OperationResult::unknown);
 }
 
 TEST(ScannerReplyMsgTest, testdeserializeValidCRC)
 {
+  scanner_reply::Type type = scanner_reply::Type::start;
+  scanner_reply::OperationResult result = scanner_reply::OperationResult::accepted;
   // Use raw data generated from serialize()
-  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  ScannerReplyMsg::RawType raw_msg{ msg.serialize() };
+  scanner_reply::Message msg(type, result);
+  scanner_reply::RawType raw_msg{ scanner_reply::serialize(msg) };
 
   MaxSizeRawData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
-  ScannerReplyMsg msg_from_raw{ ScannerReplyMsg::deserialize(data) };
+  scanner_reply::Message msg_from_raw{ scanner_reply::deserialize(data) };
 
   // Check equality by comparing crc checksums
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
-  EXPECT_EQ(crc.checksum(), ScannerReplyMsg::calcCRC(msg_from_raw));
+  EXPECT_TRUE(DecodingEquals(raw_msg, 0x00, crc.checksum()));
 }
 
 TEST(ScannerReplyMsgTest, testdeserializeInvalidCRC)
 {
+  scanner_reply::Type type = scanner_reply::Type::start;
+  scanner_reply::OperationResult result = scanner_reply::OperationResult::accepted;
   // Use raw data generated from serialize()
-  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  ScannerReplyMsg::RawType raw_msg{ msg.serialize() };
+  scanner_reply::Message msg(type, result);
+  scanner_reply::RawType raw_msg{ scanner_reply::serialize(msg) };
   raw_msg[0] += 0x01;  // alter crc checksum
 
   MaxSizeRawData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
-  EXPECT_THROW(ScannerReplyMsg::deserialize(data), ScannerReplyMsg::CRCMismatch);
+  EXPECT_THROW(scanner_reply::deserialize(data), scanner_reply::CRCMismatch);
 }
 
 }  // namespace psen_scan_v2_test

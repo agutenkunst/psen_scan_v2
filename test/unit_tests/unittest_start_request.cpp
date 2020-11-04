@@ -71,9 +71,9 @@ TEST_F(StartRequestTest, constructorTest)
   ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", scan_range, false);
 
   uint32_t sequence_number{ 123 };
-  StartRequest sr(sc, sequence_number);
+  start_request::Message sr(sc);
 
-  auto data = sr.serialize();
+  auto data = serialize(sr, sequence_number);
   boost::crc_32_type result;
   result.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
@@ -117,9 +117,9 @@ TEST_F(StartRequestTest, regressionForRealSystem)
 {
   ScannerConfiguration sc(
       "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), false);
-  StartRequest sr(sc, 0);
+  start_request::Message sr(sc);
 
-  auto data = sr.serialize();
+  auto data = serialize(sr);
 
   unsigned char expected_crc[4] = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
 
@@ -133,9 +133,9 @@ TEST_F(StartRequestTest, regressionForRealSystemWithDiagnostic)
 {
   ScannerConfiguration sc(
       "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), true);
-  StartRequest sr(sc, 0);
+  start_request::Message sr(sc);
 
-  auto data = sr.serialize();
+  auto data = serialize(sr);
 
   unsigned char expected_crc[4] = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
 

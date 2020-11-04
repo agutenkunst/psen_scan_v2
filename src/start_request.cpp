@@ -30,76 +30,11 @@ namespace psen_scan_v2
 {
 static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(2) };
 
-StartRequest::StartRequest(const ScannerConfiguration& scanner_configuration, const uint32_t& seq_number)
-  : seq_number_(seq_number)
-  , host_ip_(scanner_configuration.hostIp())
+start_request::Message::Message(const ScannerConfiguration& scanner_configuration)
+  : host_ip_(scanner_configuration.hostIp())
   , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
   , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION)
 {
-  if (scanner_configuration.diagnosticsEnabled())
-  {
-    diagnostics_enabled_ = 0b00001000;
-  }
-  crc_ = calculateCRC();
-}
-
-uint32_t StartRequest::calculateCRC() const
-{
-  boost::crc_32_type result;
-
-  DynamicSizeRawData raw_data{ serialize() };
-
-  result.process_bytes(&raw_data.at(sizeof(crc_)), raw_data.size() - sizeof(crc_));
-
-  return result.checksum();
-}
-
-DynamicSizeRawData StartRequest::serialize() const
-{
-  std::ostringstream os;
-
-  raw_processing::write(os, crc_);
-  raw_processing::write(os, seq_number_);
-  raw_processing::write(os, RESERVED_);
-  raw_processing::write(os, OPCODE_);
-
-  uint32_t host_ip_big_endian = htobe32(host_ip_);
-  raw_processing::write(os, host_ip_big_endian);
-
-  raw_processing::write(os, host_udp_port_data_);
-  raw_processing::write(os, device_enabled_);
-  raw_processing::write(os, intensity_enabled_);
-  raw_processing::write(os, point_in_safety_enabled_);
-  raw_processing::write(os, active_zone_set_enabled_);
-  raw_processing::write(os, io_pin_enabled_);
-  raw_processing::write(os, scan_counter_enabled_);
-  raw_processing::write(os, speed_encoder_enabled_);
-  raw_processing::write(os, diagnostics_enabled_);
-
-  int16_t start_angle{ master_.getScanRange().getStart().value() };
-  int16_t end_angle{ master_.getScanRange().getEnd().value() };
-  int16_t resolution{ master_.getResolution().value() };
-  raw_processing::write(os, start_angle);
-  raw_processing::write(os, end_angle);
-  raw_processing::write(os, resolution);
-
-  for (const auto& slave : slaves_)
-  {
-    int16_t slave_start_angle{ slave.getScanRange().getStart().value() };
-    int16_t slave_end_angle{ slave.getScanRange().getEnd().value() };
-    int16_t slave_resolution{ slave.getResolution().value() };
-    raw_processing::write(os, slave_start_angle);
-    raw_processing::write(os, slave_end_angle);
-    raw_processing::write(os, slave_resolution);
-  }
-
-  std::string data_str(os.str());
-
-  DynamicSizeRawData raw_data;
-  raw_data.reserve(data_str.length());
-  assert(data_str.length() == START_REQUEST_SIZE && "Message data of start request has not the expected size");
-  std::copy(data_str.begin(), data_str.end(), std::back_inserter(raw_data));
-
-  return raw_data;
+  device_settings_master_.setDiagnosticsEnabled(scanner_configuration.diagnosticsEnabled());
 }
 }  // namespace psen_scan_v2

@@ -101,10 +101,13 @@ set(${PROJECT_NAME}_sources
   src/laserscan.cpp
   src/monitoring_frame_msg.cpp
   src/start_request.cpp
+  src/start_request_serialization.cpp
   src/stop_request.cpp
+  src/stop_request_serialization.cpp
   src/scanner_configuration.cpp
   src/monitoring_frame_deserialization.cpp
   src/diagnostics.cpp
+  src/scanner_reply_serialization_deserialization.cpp
 )
 
 set(${PROJECT_NAME}_node_sources
@@ -190,6 +193,7 @@ if(CATKIN_ENABLE_TESTING)
     test/unit_tests/unittest_start_request.cpp
     src/start_request.cpp
     src/scanner_configuration.cpp
+    src/start_request_serialization.cpp
   )
   target_link_libraries(unittest_start_request
     ${catkin_LIBRARIES}
@@ -198,6 +202,7 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gtest(unittest_stop_request
     test/unit_tests/unittest_stop_request.cpp
     src/stop_request.cpp
+    src/stop_request_serialization.cpp
   )
   target_link_libraries(unittest_stop_request
     ${catkin_LIBRARIES}
@@ -266,6 +271,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_scanner_reply_msg
     test/unit_tests/unittest_scanner_reply_msg.cpp
+    src/scanner_reply_serialization_deserialization.cpp
   )
   target_link_libraries(unittest_scanner_reply_msg
     ${catkin_LIBRARIES}
@@ -330,7 +336,10 @@ catkin_add_gmock(integrationtest_scanner_api
   src/scanner_configuration.cpp
   src/start_request.cpp
   src/stop_request.cpp
+  src/stop_request_serialization.cpp
   src/diagnostics.cpp
+  src/start_request_serialization.cpp
+  src/scanner_reply_serialization_deserialization.cpp
 )
 target_link_libraries(integrationtest_scanner_api
   ${catkin_LIBRARIES}
