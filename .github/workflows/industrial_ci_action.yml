@@ -18,6 +18,9 @@ jobs:
         env:
           ROS_REPO: main
           ROS_DISTRO: melodic
+          ADDITIONAL_DEBS: tree
+          BEFORE_PREPARE_DOCKER_IMAGE: 'pwd && ls  && ls $ICI_SRC_PATH'
+          AFTER_PREPARE_DOCKER_IMAGE: 'echo "Done" && ls $ICI_SRC_PATH && echo $ICI_SRC_PATH && ls $ICI_SRC_PATH'
     continue-on-error: true
 
   build_test_testing:
