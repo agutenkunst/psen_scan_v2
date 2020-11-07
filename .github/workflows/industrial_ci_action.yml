@@ -14,13 +14,13 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
-      - uses: 'ros-industrial/industrial_ci@master'
+      - uses: 'agutenkunst/industrial_ci@master'
         env:
           ROS_REPO: main
           ROS_DISTRO: melodic
           ADDITIONAL_DEBS: tree
           BEFORE_PREPARE_DOCKER_IMAGE: 'pwd && ls  && ls $ICI_SRC_PATH'
-          AFTER_PREPARE_DOCKER_IMAGE: 'echo "Done" && ls $ICI_SRC_PATH && echo $ICI_SRC_PATH && ls $ICI_SRC_PATH'
+          AFTER_PREPARE_DOCKER_IMAGE: 'groups && echo $TARGET_REPO_PATH && ls -la $TARGET_REPO_PATH && echo "---" && echo $ICI_SRC_PATH && ls -la $ICI_SRC_PATH'
     continue-on-error: true
 
   build_test_testing:
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
-      - uses: 'ros-industrial/industrial_ci@master'
+      - uses: 'agutenkunst/industrial_ci@playground'
         env:
           ROS_REPO: testing
           ROS_DISTRO: melodic
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
-      - uses: 'ros-industrial/industrial_ci@master'
+      - uses: 'agutenkunst/industrial_ci@playground'
         env:
           ROS_REPO: testing
           ROS_DISTRO: melodic
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
-      - uses: 'ros-industrial/industrial_ci@master'
+      - uses: 'agutenkunst/industrial_ci@playground'
         env:
           ROS_REPO: testing
           ROS_DISTRO: melodic
