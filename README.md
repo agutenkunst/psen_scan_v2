@@ -4,7 +4,7 @@
 
 ## Package: psen_scan_v2
 
-The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety laser scanner product. It lets you integrate the laser scanner data into your ROS Environment easily. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview, link collection and tutorials we refer to the [ROS wiki page](http://wiki.ros.org/psen_scan_v2).
+The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety laser scanner product. It lets you integrate the laser scanner data into your ROS Environment easily. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview, link collection and tutorials we refer to the [ROS wiki page](http://wiki.ros.org/psen_scan_v2). 
 
 <p align="center">
 <img src="img/PSENscan.jpg" alt="PILZ safety laser scanner" title="PILZ safety laser scanner">
